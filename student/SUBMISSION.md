@@ -7,7 +7,7 @@
 - Họ tên: Đinh Bảo Hưng
 - MSSV: 2A202602524
 - Email:
-- Link repo (fork): https://github.com/hungdinh2611/K4-Track4-Day23-Sensor-Fusion-Student
+- Link repo (fork): https://github.com/hungdinh2611/K4-L2L3-DAY23-DinhBaoHung-2A202602524-SensorFusion
 - Commit hash nộp (`git rev-parse HEAD`): Lấy sau commit cuối và nộp trên LMS.
 
 ## Tóm tắt kết quả
