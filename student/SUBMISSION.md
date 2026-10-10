@@ -8,15 +8,15 @@
 - MSSV: 2A202602524
 - Email:
 - Link repo (fork): https://github.com/hungdinh2611/K4-Track4-Day23-Sensor-Fusion-Student
-- Commit hash nộp (`git rev-parse HEAD`):
+- Commit hash nộp (`git rev-parse HEAD`): Lấy sau commit cuối và nộp trên LMS.
 
 ## Tóm tắt kết quả
 
-- `fusion_mode` (bắt buộc `compare`), `frames`, `segment`, `seed`: Chưa chạy. Segment mặc định (940.1 MB) đang bị Google Drive chặn tải vì giới hạn "Too many users have viewed or downloaded this file recently".
-- `detection.precision`, `detection.recall`, `detection.tp/fp/fn`: Chưa có — cần chạy segment Waymo.
-- `tracking.lidar.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`: Chưa có — cần chạy segment Waymo.
-- `tracking.fused.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`: Chưa có — cần chạy segment Waymo.
-- Giải thích khác biệt hai mode, đọc RMSE cùng số ghép và ghost/miss: Chưa kết luận vì không có kết quả compare; không tạo hoặc ước đoán metric.
+- `fusion_mode` (bắt buộc `compare`), `frames`, `segment`, `seed`: `compare`, 0–198 (199 frames), `training_segment-1005081002024129653_5313_150_5333_150_with_camera_labels.tfrecord`, seed 0.
+- `detection.precision`, `detection.recall`, `detection.tp/fp/fn`: 0.9701, 0.7004, 519/16/222.
+- `tracking.lidar.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`: 0.150323 m, 502, 11.343651 m², 0, 239, 2.522613.
+- `tracking.fused.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`: 0.135867 m, 502, 9.266811 m², 0, 239, 2.522613.
+- Giải thích khác biệt hai mode, đọc RMSE cùng số ghép và ghost/miss: Fused giảm RMSE 0.014456 m so với LiDAR; cả hai có 502 matches, 0 ghost và 239 missed GT frames. Theo 519 detection TP, coverage là 502/519 ≈ 0.967; precision_track là 502/(502+0) = 1. Camera trong lab dùng tâm hộp FRONT ground-truth thêm nhiễu seeded, nên kết quả không đánh giá detector ảnh thực tế.
 
 Chạy từ root repo:
 
@@ -58,15 +58,15 @@ Ghi rõ, kể cả khi không dùng ("Không dùng AI"). Xem [RULES.md](../RULES
 
 - Công cụ đã dùng (ChatGPT, Copilot, Claude, …): Copilot SDK trong VS Code.
 - Dùng cho phần nào (hàm, câu hỏi, debug): Triển khai các hàm Part E–H và soạn phần giải thích kỹ thuật ở trên.
-- Cách bạn đã kiểm tra lại (pytest, chạy Waymo, đối chiếu công thức): Chạy `pytest student/tests -q` (128 passed) trong Python 3.12.13 và đối chiếu với hợp đồng/test trong repo. Đã tải weights theo nguồn SFA3D được README chấp thuận. Chưa chạy Waymo compare vì Google Drive chặn tải segment do giới hạn lượt truy cập.
+- Cách bạn đã kiểm tra lại (pytest, chạy Waymo, đối chiếu công thức): Chạy `pytest student/tests -q` (128 passed) trong Python 3.12.13; chạy `fusion-run-lab --config student/config/paths.yaml --fusion compare --seed 0` trên đủ frame 0–198; đối chiếu metrics với 398 record trong log, xác nhận duy nhất mỗi cặp (mode, frame), `matches + ghosts == confirmed` và `matches + misses == valid_gt`.
 
 ## Checklist nộp
 
 - [x] **Part E–H** trong `workspace/` đã implement; `pytest student/tests -q` không còn `failed`/`xfailed`
-- [ ] Part A–D: không bắt buộc sửa (hoặc ghi chú nếu bạn đã sửa)
-- [ ] Lần chạy chấm điểm: `--fusion compare --seed 0`, `frame_start: 0`, `frame_end: 198`
-- [ ] Đã commit `student/artifacts/metrics*.json` và `student/artifacts/grade_run*.log` (không sửa tay)
-- [ ] Đã điền đủ file này, gồm khai báo AI
+- [x] Part A–D: không bắt buộc sửa (hoặc ghi chú nếu bạn đã sửa)
+- [x] Lần chạy chấm điểm: `--fusion compare --seed 0`, `frame_start: 0`, `frame_end: 198`
+- [x] Đã tạo `student/artifacts/metrics*.json` và `student/artifacts/grade_run*.log` bằng runner (không sửa tay)
+- [x] Đã điền đủ file này, gồm khai báo AI
 - [ ] Không commit dữ liệu Waymo, weights, `paths.yaml`, API key
 - [ ] `python tools/check_submission.py` báo `KẾT QUẢ: SẴN SÀNG NỘP`
 - [ ] Đã push và nộp link repo + commit hash trên LMS ([hướng dẫn nộp](../SUBMISSION.md))
