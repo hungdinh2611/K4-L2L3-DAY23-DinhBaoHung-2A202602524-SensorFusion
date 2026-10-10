@@ -4,19 +4,19 @@
 
 ## Thông tin học viên
 
-- Họ tên:
-- MSSV:
+- Họ tên: Đinh Bảo Hưng
+- MSSV: 2A202602524
 - Email:
-- Link repo (fork):
+- Link repo (fork): https://github.com/hungdinh2611/K4-Track4-Day23-Sensor-Fusion-Student
 - Commit hash nộp (`git rev-parse HEAD`):
 
 ## Tóm tắt kết quả
 
-- `fusion_mode` (bắt buộc `compare`), `frames`, `segment`, `seed`: Chưa chạy — chưa có segment Waymo và weights trong `data/`.
-- `detection.precision`, `detection.recall`, `detection.tp/fp/fn`:
-- `tracking.lidar.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`:
-- `tracking.fused.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`:
-- Giải thích khác biệt hai mode, đọc RMSE cùng số ghép và ghost/miss: Chưa thể kết luận khi chưa có artifacts của lần chạy compare.
+- `fusion_mode` (bắt buộc `compare`), `frames`, `segment`, `seed`: Chưa chạy. Segment mặc định (940.1 MB) đang bị Google Drive chặn tải vì giới hạn "Too many users have viewed or downloaded this file recently".
+- `detection.precision`, `detection.recall`, `detection.tp/fp/fn`: Chưa có — cần chạy segment Waymo.
+- `tracking.lidar.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`: Chưa có — cần chạy segment Waymo.
+- `tracking.fused.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`: Chưa có — cần chạy segment Waymo.
+- Giải thích khác biệt hai mode, đọc RMSE cùng số ghép và ghost/miss: Chưa kết luận vì không có kết quả compare; không tạo hoặc ước đoán metric.
 
 Chạy từ root repo:
 
@@ -58,11 +58,11 @@ Ghi rõ, kể cả khi không dùng ("Không dùng AI"). Xem [RULES.md](../RULES
 
 - Công cụ đã dùng (ChatGPT, Copilot, Claude, …): Copilot SDK trong VS Code.
 - Dùng cho phần nào (hàm, câu hỏi, debug): Triển khai các hàm Part E–H và soạn phần giải thích kỹ thuật ở trên.
-- Cách bạn đã kiểm tra lại (pytest, chạy Waymo, đối chiếu công thức): Chạy `pytest student/tests -q` (128 passed) trong Python 3.12.13 và đối chiếu với hợp đồng/test trong repo. Chưa chạy Waymo compare vì segment và weights chưa có trong `data/`.
+- Cách bạn đã kiểm tra lại (pytest, chạy Waymo, đối chiếu công thức): Chạy `pytest student/tests -q` (128 passed) trong Python 3.12.13 và đối chiếu với hợp đồng/test trong repo. Đã tải weights theo nguồn SFA3D được README chấp thuận. Chưa chạy Waymo compare vì Google Drive chặn tải segment do giới hạn lượt truy cập.
 
 ## Checklist nộp
 
-- [ ] **Part E–H** trong `workspace/` đã implement; `pytest student/tests -q` không còn `failed`/`xfailed`
+- [x] **Part E–H** trong `workspace/` đã implement; `pytest student/tests -q` không còn `failed`/`xfailed`
 - [ ] Part A–D: không bắt buộc sửa (hoặc ghi chú nếu bạn đã sửa)
 - [ ] Lần chạy chấm điểm: `--fusion compare --seed 0`, `frame_start: 0`, `frame_end: 198`
 - [ ] Đã commit `student/artifacts/metrics*.json` và `student/artifacts/grade_run*.log` (không sửa tay)
