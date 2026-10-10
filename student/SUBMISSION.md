@@ -12,11 +12,11 @@
 
 ## Tóm tắt kết quả
 
-- `fusion_mode` (bắt buộc `compare`), `frames`, `segment`, `seed`:
+- `fusion_mode` (bắt buộc `compare`), `frames`, `segment`, `seed`: Chưa chạy — chưa có segment Waymo và weights trong `data/`.
 - `detection.precision`, `detection.recall`, `detection.tp/fp/fn`:
 - `tracking.lidar.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`:
 - `tracking.fused.rmse`, `matches`, `sum_sq_err`, `ghost_track_frames`, `missed_gt_frames`, `mean_confirmed_tracks`:
-- Giải thích khác biệt hai mode, đọc RMSE cùng số ghép và ghost/miss:
+- Giải thích khác biệt hai mode, đọc RMSE cùng số ghép và ghost/miss: Chưa thể kết luận khi chưa có artifacts của lần chạy compare.
 
 Chạy từ root repo:
 
@@ -38,13 +38,12 @@ File per-mode `metrics_lidar.json`, `metrics_fused.json`, `grade_run_lidar.log`,
 
 ## Giải thích ngắn (Parts E–H — tự viết)
 
-1. Khác biệt đo lidar 3D và camera 2D trong EKF (`z`, `R`)?
-2. Vì sao cần gating Mahalanobis trước khi gán?
-3. Pipeline là track-then-fuse hay fuse-then-track? Chỉ ra trên log `fusion-run-lab`.
-4. Nếu camera lệch calibration, triệu chứng gì trên innovation/residual?
-5. Vì sao `associate_and_update(..., sensor)` cần sensor tường minh ở frame rỗng?
-   Giải thích vì sao lidar quyết định score/init/delete còn camera chỉ EKF update.
-6. Nêu điều kiện xác nhận, giữ confirmed sau miss, và điều kiện xóa track.
+1. LiDAR đo tâm xe 3D (`z` có 3 phần tử); EKF dùng các hàng vị trí của H và covariance R theo mét. Camera đo pixel 2D (`u, v`); H là Jacobian chiếu pinhole và R là covariance theo pixel. Cả hai cập nhật cùng trạng thái 6D trong `student/workspace/kalman.py`.
+2. Mahalanobis chuẩn hoá sai số theo độ bất định của track và measurement. Cổng chi-square theo số chiều đo loại cặp không phù hợp trước greedy matching, thay vì coi mọi mét hoặc pixel có cùng ý nghĩa như khoảng cách Euclid.
+3. Đây là track-then-fuse: một danh sách track được predict một lần, sau đó association/update LiDAR chạy trước camera trên cùng track. Camera chỉ hiệu chỉnh trạng thái; thứ tự được triển khai trong runner `fusion_lab.scripts.run_lab` và association trong `student/workspace/association.py`.
+4. Sai calibration thường tạo residual/innovation camera có độ lệch có hệ thống theo vị trí ảnh. Điều đó làm tăng Mahalanobis distance, khiến association bị gate; nếu vẫn được ghép, phép update có thể kéo lệch vị trí ước lượng.
+5. Sensor tường minh cho biết lượt hiện tại là LiDAR hay camera ngay cả khi không có measurement, để luôn gọi `manager.manage_tracks(...)`. Lượt LiDAR quản lý hit/miss, sinh và xoá track; lượt camera chỉ update EKF, không thay đổi score hay vòng đời.
+6. Track khởi tạo với score `1/window`; mỗi hit LiDAR cộng `1/window` tối đa 1. Track được xác nhận khi score lớn hơn `confirmed_threshold`, và trạng thái confirmed được giữ qua miss. Xoá khi Pxx hoặc Pyy vượt `max_P`, confirmed có score thấp hơn `delete_threshold`, hoặc track chưa confirmed có score ≤ 0 (`student/workspace/track_management.py`).
 
 ## Bonus (không bắt buộc)
 
@@ -57,9 +56,9 @@ Liệt kê phần bonus đã làm, file bằng chứng trong `student/bonus/` v�
 
 Ghi rõ, kể cả khi không dùng ("Không dùng AI"). Xem [RULES.md](../RULES.md) mục 2.
 
-- Công cụ đã dùng (ChatGPT, Copilot, Claude, …):
-- Dùng cho phần nào (hàm, câu hỏi, debug):
-- Cách bạn đã kiểm tra lại (pytest, chạy Waymo, đối chiếu công thức):
+- Công cụ đã dùng (ChatGPT, Copilot, Claude, …): Copilot SDK trong VS Code.
+- Dùng cho phần nào (hàm, câu hỏi, debug): Triển khai các hàm Part E–H và soạn phần giải thích kỹ thuật ở trên.
+- Cách bạn đã kiểm tra lại (pytest, chạy Waymo, đối chiếu công thức): Chạy `pytest student/tests -q` (128 passed) trong Python 3.12.13 và đối chiếu với hợp đồng/test trong repo. Chưa chạy Waymo compare vì segment và weights chưa có trong `data/`.
 
 ## Checklist nộp
 
